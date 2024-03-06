@@ -60,70 +60,72 @@ def Stype_error_checker(assembly_instruction):
 def ierror(k):#k=["instruction_code","rd,rs,imm"]
     x=k[1].split(",")
     if k[0] not in ["lw","addi","sltiu","jalr"]:
-        return False
+        return (-1,-1,-1,-1)
     elif k[0]=="lw":
         if x[0] not in registers_list:
-            return False
+            return (-1,-1,-1,-1)
         z=x[1].find("(")
         z_=x[1].find(")")
         if z==-1 or z_==-1:
-            return False
+            return (-1,-1,-1,-1)
         else:
             imm=x[1][0:z]
             if int(imm)<=pow(-2,11) or int(imm)>(pow(2,11)-1):
-                return False
+                return (-1,-1,-1,-1)
             rs=x[1][z+1:x[1].find(")")]
             if rs not in registers_list:
-                return False
+                return (-1,-1,-1,-1)
+        return Itype("lw",x[0],rs,imm)
     else:
         if x[0] not in registers_list:
-            return False
+            return (-1,-1,-1,-1)
         if x[1] not in registers_list:
-            return False
+            return (-1,-1,-1,-1)
         if int(x[2])<=pow(-2,11) or int(x[2])>(pow(2,11)-1):
-            return False
-    return True
-#passing arguement take care of lw
-def Itype(InstructionCode,rd,rs,imm,pc):
-    #InstructionCode is string, 
-    #rd is binary string, rs is binary string
-    #imm is integer/string
-    #pc is integer
-    s = binary_functions.BinaryConverter(imm)
-    finalbin=""
-    if InstructionCode=="lw":
-        finalbin=s+rs+"010"+rd+"0000011"
-        pc+=4
-    elif InstructionCode=="addi":
-        finalbin=s+rs+"000"+rd+"0010011"
-        pc+=4
-    elif InstructionCode=="sltiu":
-        finalbin=s+rs+"011"+rd+"0010011"
-        pc+=4
-    elif InstructionCode=="jalr":
-        finalbin=s+rs+"000"+rd+"1100111"
-        pc+=4
-    return finalbin
+            return (-1,-1,-1,-1)
+    return Itype(k[0],x[0],x[1],x[2])
 def uerror(k):#k=["instruction code","rd,imm"]
     if k[0] not in ["auipc","lui"]:
-        return False
+        return (-1,-1,-1,-1)
     else:
         x=k[1].split(",")
         if len(x)!=2:
-            return False
+            return (-1,-1,-1,-1)
         if x[0] not in registers_list:
-            return False
+            return (-1,-1,-1,-1)
         if int(x[1])<pow(-2,11) or int(x[1])>(pow(2,11)-1):
-            return False
-    return True
-def UType(InstructionCode,rd,imm,pc):
-    s=binary_functions.BinaryConverter(imm)+rd
+            return (-1,-1,-1,-1)
+    return (k[0],x[0],x[1])
+def UType(InstructionCode,rd,imm):
+    s=BinaryConverter(imm)
+    if imm<0:
+        s="1"*(32-len(s))+s
+        s=s[0:20]+rd
+    else:
+        s="0"*(32-len(s))+s
+        s=s[0:20]+rd
     if InstructionCode=="lui":
         s=s+"0110111"
     else:
         s=s+"0010111"
     return s
-
+#passing arguement take care of lw
+def Itype(InstructionCode,rd,rs,imm):
+    #InstructionCode is string, 
+    #rd is binary string, rs is binary string
+    #imm is integer/string
+    #pc is integer
+    s=BinaryConverter(imm)
+    finalbin=""
+    if InstructionCode=="lw":
+        finalbin=s+rs+"010"+rd+"0000011"
+    elif InstructionCode=="addi":
+        finalbin=s+rs+"000"+rd+"0010011"
+    elif InstructionCode=="sltiu":
+        finalbin=s+rs+"011"+rd+"0010011"
+    elif InstructionCode=="jalr":
+        finalbin=s+rs+"000"+rd+"1100111"
+    return finalbin
 def Rtype(instruction,r2,r1,rd): 
     #func7,r2,r1,func3,rd are strings
     opcodedefault = "0110011" # since it is same for all Rtype
@@ -172,21 +174,34 @@ def Rtype(instruction,r2,r1,rd):
     return s1
 
 def Rtype_error_checker(k):  # returns true if no error is found,k input string split around space
-        parameters = k[1].split(",")
-        for i in parameters: # checks if all registers passed valid
-            if(str(i) in registers_list):
-                continue;
-            else:
-                return False
-        if(k[0] in R_type_instructions):
-            pass
+        flag = 0
+        if(len(k)==2):
+            parameters = k[1].split(",")
+            for i in parameters: # checks if all registers passed valid
+                if(str(i) in registers_list):
+                     continue;
+                else:
+                     flag =1
+                     
+            if(k[0] in R_type_instructions):
+                pass
         
-        else:
-             return False
+            else:
+                flag=1
             
-        if(len(parameters) != 3 or len(k)!=2):
-             return False
-        return True
+            if(len(parameters) != 3):
+                flag=1
+             
+        else:
+            flag =1
+        
+        if(flag==0): # return in the form instruction code,rd,rs1,rs2
+            tuple1 = (k[0],parameters[0],parameters[1],parameters[2])
+            return tuple1
+        
+        if(flag==1):
+            tuple1 = (-1,-1,-1,-1)
+            return tuple1
 
 def Jtype(inst_code,rd,imm):
     opcode = "1101111"
