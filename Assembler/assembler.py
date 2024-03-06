@@ -124,7 +124,7 @@ def UType(InstructionCode,rd,imm,pc):
         s=s+"0010111"
     return s
 
-def Rtype(instruction,r2,r1,rd): 
+def Rtype(instruction,rd,r1,r2): 
     #func7,r2,r1,func3,rd are strings
     opcodedefault = "0110011" # since it is same for all Rtype
     func3 ="";
