@@ -172,21 +172,34 @@ def Rtype(instruction,r2,r1,rd):
     return s1
 
 def Rtype_error_checker(k):  # returns true if no error is found,k input string split around space
-        parameters = k[1].split(",")
-        for i in parameters: # checks if all registers passed valid
-            if(str(i) in registers_list):
-                continue;
-            else:
-                return False
-        if(k[0] in R_type_instructions):
-            pass
+        flag = 0
+        if(len(k)==2):
+            parameters = k[1].split(",")
+            for i in parameters: # checks if all registers passed valid
+                if(str(i) in registers_list):
+                     continue;
+                else:
+                     flag =1
+                     
+            if(k[0] in R_type_instructions):
+                pass
         
-        else:
-             return False
+            else:
+                flag=1
             
-        if(len(parameters) != 3 or len(k)!=2):
-             return False
-        return True
+            if(len(parameters) != 3):
+                flag=1
+             
+        else:
+            flag =1
+        
+        if(flag==0): # return in the form instruction code,rd,rs1,rs2
+            tuple1 = (k[0],parameters[0],parameters[1],parameters[2])
+            return tuple1
+        
+        if(flag==1):
+            tuple1 = (-1,-1,-1,-1)
+            return tuple1
 
 def Jtype(inst_code,rd,imm):
     opcode = "1101111"
