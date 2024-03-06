@@ -96,8 +96,9 @@ def uerror(k):#k=["instruction code","rd,imm"]
         if int(x[1])<pow(-2,11) or int(x[1])>(pow(2,11)-1):
             return (-1,-1,-1,-1)
     return (k[0],x[0],x[1])
+
 def UType(InstructionCode,rd,imm):
-    s=BinaryConverter(imm)
+    s=binary_functions.BinaryConverter(imm)
     if imm<0:
         s="1"*(32-len(s))+s
         s=s[0:20]+rd
@@ -109,13 +110,14 @@ def UType(InstructionCode,rd,imm):
     else:
         s=s+"0010111"
     return s
+
 #passing arguement take care of lw
 def Itype(InstructionCode,rd,rs,imm):
     #InstructionCode is string, 
     #rd is binary string, rs is binary string
     #imm is integer/string
     #pc is integer
-    s=BinaryConverter(imm)
+    s=binary_functions.BinaryConverter(imm)
     finalbin=""
     if InstructionCode=="lw":
         finalbin=s+rs+"010"+rd+"0000011"
