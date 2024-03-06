@@ -38,24 +38,25 @@ def Stype_instruction(inst_code,rs1,rs2,imm):
 #To check the credibility of Stype instruction
 #returns False if instruction syntax not according to rules
 def Stype_error_checker(assembly_instruction):
+    t1 = (-1,-1,-1,-1)
     if assembly_instruction[0]!="sw":
-        return False
+        return t1
     parameters  = assembly_instruction[1].split(",")
     if len(parameters)!=2:
-        return False
+        return t1
     source_reg1 = parameters[0]
     x=parameters[1].find("(")
     y=parameters[1].find(")")
     if (x==-1 or y==-1):
-        return False
+        return t1
     source_reg2 = parameters[1][x+1:y]
     immediate_val = parameters[1][:x]
 
     if source_reg1 not in registers_list or source_reg2 not in registers_list:
-        return False
+        return t1
     if int(immediate_val)<=pow(-2,11) or int(immediate_val)>(pow(2,11)-1):
-        return False
-    return True
+        return t1
+    return (assembly_instruction[0],source_reg1,source_reg2,immediate_val)
 
 def ierror(k):#k=["instruction_code","rd,rs,imm"]
     x=k[1].split(",")
@@ -213,14 +214,14 @@ def Jtype(inst_code,rd,imm):
     return bin_string
 
 def Jtype_error_checker(assembly_instruction):
+    t1=(-1,-1,-1,-1)
     if assembly_instruction[0]!="jal":
-        return False
+        return t1
     x=assembly_instruction[1].split(",")
     if len(x)!=2:
-        return False
+        return t1
     if (x[0] not in registers_list):
-        return False
+        return t1
     if int(x[1])<(-pow(2,20)) or int(x[1])>(pow(2,20)-1):
-        return False
-    return True
-
+        return t1
+    return (assembly_instruction[0],x[0],x[1])
