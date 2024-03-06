@@ -207,4 +207,3 @@ def Jtype_error_checker(assembly_instruction):
         return False
     return True
 
-print(Jtype_error_checker(["jal","ra,90"]))
