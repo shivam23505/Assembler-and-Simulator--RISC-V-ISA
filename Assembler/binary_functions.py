@@ -43,3 +43,5 @@ def sign_extension(bin_string,final_length):
     else:
         bin_string = "0"*temp + bin_string
     return bin_string
+    
+
