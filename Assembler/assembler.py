@@ -188,3 +188,23 @@ def Rtype_error_checker(k):  # returns true if no error is found,k input string 
              return False
         return True
 
+def Jtype(inst_code,rd,imm):
+    opcode = "1101111"
+    imm_binary = binary_functions.BinaryConverter(int(imm))
+    imm_binary = binary_functions.sign_extension(imm_binary,20)
+    bin_string = imm_binary[0] + imm_binary[10:] + imm_binary[10]+imm_binary[1:9]+ rd + opcode
+    return bin_string
+
+def Jtype_error_checker(assembly_instruction):
+    if assembly_instruction[0]!="jal":
+        return False
+    x=assembly_instruction[1].split(",")
+    if len(x)!=2:
+        return False
+    if (x[0] not in registers_list):
+        return False
+    if int(x[1])<(-pow(2,20)) or int(x[1])>(pow(2,20)-1):
+        return False
+    return True
+
+print(Jtype_error_checker(["jal","ra,90"]))
