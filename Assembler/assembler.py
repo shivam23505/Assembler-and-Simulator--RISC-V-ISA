@@ -335,7 +335,7 @@ def main_program():
             results.append(ans_string)
             pc+=4   
 
-    with open("output.txt","a") as out:
+    with open("output.txt","w") as out:
         for i in results:
             if i==len(results)-1:
                 out.write(i)
