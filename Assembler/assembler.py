@@ -47,6 +47,8 @@ def Stype_error_checker(assembly_instruction):
     source_reg1 = parameters[0]
     x=parameters[1].find("(")
     y=parameters[1].find(")")
+    if len(parameters[1])-1!=y:
+        return t1
     if (x==-1 or y==-1):
         return t1
     source_reg2 = parameters[1][x+1:y]
@@ -103,7 +105,7 @@ def UType(t):#InstructionCode,rd,imm
     InstructionCode=t[0]
     rd=t[1]
     imm=t[2]
-    s=BinaryConverter(imm)
+    s=binary_functions.BinaryConverter(imm)
     if imm<0:
         s="1"*(32-len(s))+s
         s=s[0:20]+rd
@@ -124,7 +126,7 @@ def Itype(t):#InstructionCode,rd,rs,imm
     rd=t[1]
     rs=t[2]
     imm=t[3]
-    s=BinaryConverter(imm)
+    s=binary_functions.BinaryConverter(imm)
     finalbin=""
     if InstructionCode=="lw":
         finalbin=s+rs+"010"+rd+"0000011"
