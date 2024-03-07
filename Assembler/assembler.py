@@ -28,11 +28,11 @@ for i in range(len(registers_list)):
 #Converting the S-type instructions into binary
 #Syntax -- {instruction_code}{space}{return_address_reg}{,}{Source_reg}{,}{imm[11:0]}
 #All the parameters are in string data type
-def Stype_instruction(inst_code,rs1,rs2,imm):
+def Stype_instruction(t):
     opcode = "0100011"
     funct3 = "010"
-    imm_binary = binary_functions.BinaryConverter(int(imm))
-    bin_string = imm_binary[:8] + rs2 + rs1 + funct3 + imm_binary[8:] + opcode
+    imm_binary = binary_functions.BinaryConverter(int(t[3]))
+    bin_string = imm_binary[:8] + t[2] + t[1] + funct3 + imm_binary[8:] + opcode
     return bin_string
 
 #To check the credibility of Stype instruction
@@ -211,11 +211,11 @@ def Rtype_error_checker(k):  # returns true if no error is found,k input string 
             tuple1 = (-1,-1,-1,-1)
             return tuple1
 
-def Jtype(inst_code,rd,imm):
+def Jtype(t):
     opcode = "1101111"
-    imm_binary = binary_functions.BinaryConverter(int(imm))
+    imm_binary = binary_functions.BinaryConverter(int(t[2]))
     imm_binary = binary_functions.sign_extension(imm_binary,20)
-    bin_string = imm_binary[0] + imm_binary[10:] + imm_binary[10]+imm_binary[1:9]+ rd + opcode
+    bin_string = imm_binary[0] + imm_binary[10:] + imm_binary[10]+imm_binary[1:9]+ t[1] + opcode
     return bin_string
 
 def Jtype_error_checker(assembly_instruction):
