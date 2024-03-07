@@ -1,7 +1,2 @@
-add ra,zero,sp
-sub t1,t2,s0 
-hello:jal ra,-1024
-sw ra,32(sp)
-
-sw ra,32(sp)
+lw a5,20(s1)
 beq zero,zero,0x00000000

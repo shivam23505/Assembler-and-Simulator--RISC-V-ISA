@@ -23,6 +23,7 @@ registers_encoding = {}
 for i in range(len(registers_list)):
     registers_encoding[registers_list[i]] = binary_functions.Binary_5_convert(i)
 
+Lables = {}
 ##############################################################################################################
     
 #Converting the S-type instructions into binary
@@ -47,6 +48,8 @@ def Stype_error_checker(assembly_instruction):
     source_reg1 = parameters[0]
     x=parameters[1].find("(")
     y=parameters[1].find(")")
+    if len(parameters[1])-1!=y:
+        return t1
     if (x==-1 or y==-1):
         return t1
     source_reg2 = parameters[1][x+1:y]
@@ -54,7 +57,7 @@ def Stype_error_checker(assembly_instruction):
 
     if source_reg1 not in registers_list or source_reg2 not in registers_list:
         return t1
-    if int(immediate_val)<=pow(-2,11) or int(immediate_val)>(pow(2,11)-1):
+    if int(immediate_val)<pow(-2,11) or int(immediate_val)>(pow(2,11)-1):
         return t1
     return (assembly_instruction[0],source_reg1,source_reg2,immediate_val)
 
@@ -76,7 +79,9 @@ def ierror(k):#k=["instruction_code","rd,rs,imm"]
             rs=x[1][z+1:x[1].find(")")]
             if rs not in registers_list:
                 return (-1,-1,-1,-1)
-        return Itype("lw",x[0],rs,imm)
+            if x[1][-2]!=")":
+                return(-1,-1,-1,-1)
+        return ("lw",registers_encoding[x[0]],registers_encoding[rs],imm)
     else:
         if x[0] not in registers_list:
             return (-1,-1,-1,-1)
@@ -84,7 +89,7 @@ def ierror(k):#k=["instruction_code","rd,rs,imm"]
             return (-1,-1,-1,-1)
         if int(x[2])<=pow(-2,11) or int(x[2])>(pow(2,11)-1):
             return (-1,-1,-1,-1)
-    return Itype(k[0],x[0],x[1],x[2])
+    return (k[0],registers_encoding[x[0]],registers_encoding[x[1]],x[2])
 def uerror(k):#k=["instruction code","rd,imm"]
     if k[0] not in ["auipc","lui"]:
         return (-1,-1,-1,-1)
@@ -96,11 +101,13 @@ def uerror(k):#k=["instruction code","rd,imm"]
             return (-1,-1,-1,-1)
         if int(x[1])<pow(-2,11) or int(x[1])>(pow(2,11)-1):
             return (-1,-1,-1,-1)
-    return (k[0],x[0],x[1])
-
-def UType(InstructionCode,rd,imm):
-    s=binary_functions.BinaryConverter(imm)
-    if imm<0:
+    return (k[0],registers_encoding[x[0]],x[1])
+def UType(t):#InstructionCode,rd,imm
+    InstructionCode=t[0]
+    rd=t[1]
+    imm=t[2]
+    s=binary_functions.BinaryConverter((imm))
+    if int(imm)<0:
         s="1"*(32-len(s))+s
         s=s[0:20]+rd
     else:
@@ -111,13 +118,15 @@ def UType(InstructionCode,rd,imm):
     else:
         s=s+"0010111"
     return s
-
 #passing arguement take care of lw
-def Itype(InstructionCode,rd,rs,imm):
+def Itype(t):#InstructionCode,rd,rs,imm
     #InstructionCode is string, 
     #rd is binary string, rs is binary string
     #imm is integer/string
-    #pc is integer
+    InstructionCode=t[0]
+    rd=t[1]
+    rs=t[2]
+    imm=t[3]
     s=binary_functions.BinaryConverter(imm)
     finalbin=""
     if InstructionCode=="lw":
@@ -212,11 +221,12 @@ def Rtype_error_checker(k):  # returns true if no error is found,k input string 
             tuple1 = (-1,-1,-1,-1)
             return tuple1
 
-def Jtype(t):
+def Jtype(t,pc):
     opcode = "1101111"
-    imm_binary = binary_functions.BinaryConverter(int(t[2]))
-    imm_binary = binary_functions.sign_extension(imm_binary,20)
-    bin_string = imm_binary[0] + imm_binary[10:] + imm_binary[10]+imm_binary[1:9]+ registers_encoding[t[1]] + opcode
+    destination = Lables[t[2]]-pc
+    imm_binary = binary_functions.BinaryConverter(destination)
+    imm_binary = binary_functions.sign_extension(imm_binary,21)
+    bin_string = imm_binary[0] + imm_binary[10:20] + imm_binary[9]+imm_binary[1:9]+ registers_encoding[t[1]] + opcode
     return bin_string
 
 def Jtype_error_checker(assembly_instruction):
@@ -228,20 +238,63 @@ def Jtype_error_checker(assembly_instruction):
         return t1
     if (x[0] not in registers_list):
         return t1
-    if int(x[1])<(-pow(2,20)) or int(x[1])>(pow(2,20)-1):
+    if x[1] not in Lables:
         return t1
+    # if int(x[1])<(-pow(2,20)) or int(x[1])>(pow(2,20)-1):
+    #     return t1
     return (assembly_instruction[0],x[0],x[1])
 
+def Btype(k,pc):
+    destination = Lables[k[3]]-pc
+    s0=binary_functions.BinaryConverter(str(destination))
+    s0 =binary_functions.sign_extension(s0,13)
+    s=s0[0]+s0[2:8]
+    s2=s0[8:12]+s0[1]
+    opcode="1100011"
+    if k[0]=="beq":
+        funct3="000"
+        result=s+registers_encoding[k[2]]+registers_encoding[k[1]]+funct3+s2+opcode
+    elif k[0]=="bne":
+        funct3="001"
+        result=s+registers_encoding[k[2]]+registers_encoding[k[1]]+funct3+s2+opcode
+    elif k[0]=="blt":
+        funct3="100"
+        result=s+registers_encoding[k[2]]+registers_encoding[k[1]]+funct3+s2+opcode
+    elif k[0]=="bge":
+        funct3="101"
+        result=s+registers_encoding[k[2]]+registers_encoding[k[1]]+funct3+s2+opcode
+    elif k[0]=="bltu":
+        funct3="110"
+        result=s+registers_encoding[k[2]]+registers_encoding[k[1]]+funct3+s2+opcode
+    elif k[0]=="bgeu":
+        funct3="111"
+        result=s+registers_encoding[k[2]]+registers_encoding[k[1]]+funct3+s2+opcode
+    return result
+
+def B_error_checker(h):#eg:h=[inst,"t,imm"]
+    if h[0] not in B_type_instructions:
+        return (-1,-1,-1,-1)
+    y=h[1].split(",")
+    if len(y)!=3:
+        return (-1,-1,-1,-1)
+    if (y[0] not in registers_list) or (y[1] not in registers_list):
+        return (-1,-1,-1,-1)
+    if y[2] not in Lables:
+        return (-1,-1,-1,-1)
+    # if int(y[2])<pow(-2,11) or int(y[2])>(pow(2,11)-1):
+    #     return (-1,-1,-1,-1)
+    return (h[0],y[0],y[1],y[2])
+    
 def main_program():
     with open("input.txt") as f:
         data = f.readlines()
     for i in data:
         i.strip()
-    Lables = {}
+    
     results = []
     hlt = "beq zero,zero,0x00000000"
     if data[-1]!=hlt:
-        print("Error: Line:",len(data),"-->VIrtual Halt not at last")
+        print("Error: Line:",len(data),"-->Virtual Halt not at last")
         return
     pc = 0
     for i in range(len(data)-1):
@@ -252,7 +305,7 @@ def main_program():
         elif data[i]=="\n":
             continue
         elif data[i] ==hlt:
-            print("Error at Line:",i+1,"-->VIrtual Halt twice")
+            print("Error at Line:",i+1,"-->Virtual Halt twice")
             return
         pc+=4
         
@@ -270,11 +323,11 @@ def main_program():
             elif Stype_error_checker(k)[0]!=-1:
                 ans_string = Stype_instruction(Stype_error_checker(k))
             elif Jtype_error_checker(k)[0]!=-1:
-                ans_string = Jtype(Jtype_error_checker(k))
+                ans_string = Jtype(Jtype_error_checker(k),pc)
             elif uerror(k)[0]!=-1:
                 ans_string = UType(uerror(k))
-            #elif Btype_error_checker(k)[0]!=-1:
-            #    ans_string = Btype(k)
+            elif B_error_checker(k)[0]!=-1:
+                ans_string = Btype(B_error_checker(k),pc)
             else:
                 print("Error at line:",i+1,"Invalid Instruction")
                 return
@@ -282,12 +335,11 @@ def main_program():
             results.append(ans_string)
             pc+=4   
 
-    with open("output.txt","a") as out:
+    with open("output.txt","w") as out: # w modes allows us to refresh output file 
         for i in results:
             if i==len(results)-1:
                 out.write(i)
             else:
                 out.write(i+"\n")
-    print(Lables)
-        
+    
 main_program()
