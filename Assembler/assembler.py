@@ -32,7 +32,7 @@ def Stype_instruction(t):
     opcode = "0100011"
     funct3 = "010"
     imm_binary = binary_functions.BinaryConverter(int(t[3]))
-    bin_string = imm_binary[:8] + t[2] + t[1] + funct3 + imm_binary[8:] + opcode
+    bin_string = imm_binary[:8] + registers_encoding[t[2]] + registers_encoding[t[1]] + funct3 + imm_binary[8:] + opcode
     return bin_string
 
 #To check the credibility of Stype instruction
@@ -215,7 +215,7 @@ def Jtype(t):
     opcode = "1101111"
     imm_binary = binary_functions.BinaryConverter(int(t[2]))
     imm_binary = binary_functions.sign_extension(imm_binary,20)
-    bin_string = imm_binary[0] + imm_binary[10:] + imm_binary[10]+imm_binary[1:9]+ t[1] + opcode
+    bin_string = imm_binary[0] + imm_binary[10:] + imm_binary[10]+imm_binary[1:9]+ registers_encoding[t[1]] + opcode
     return bin_string
 
 def Jtype_error_checker(assembly_instruction):
