@@ -76,7 +76,7 @@ def ierror(k):#k=["instruction_code","rd,rs,imm"]
             rs=x[1][z+1:x[1].find(")")]
             if rs not in registers_list:
                 return (-1,-1,-1,-1)
-            if x[1][-2]!=")":
+            if x[1][-1]!=")":
                 return(-1,-1,-1,-1)
         return ("lw",registers_encoding[x[0]],registers_encoding[rs],imm)
     else:
@@ -98,7 +98,7 @@ def uerror(k):#k=["instruction code","rd,imm"]
             return (-1,-1,-1,-1)
         if int(x[1])<pow(-2,11) or int(x[1])>(pow(2,11)-1):
             return (-1,-1,-1,-1)
-    return (k[0],registers_encoding[x[0]],x[1])
+    return (k[0],registers_encoding[x[0]],int(x[1]))
 def UType(t):#InstructionCode,rd,imm
     InstructionCode=t[0]
     rd=t[1]
