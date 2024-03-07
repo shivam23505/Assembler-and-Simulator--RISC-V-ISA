@@ -106,8 +106,8 @@ def UType(t):#InstructionCode,rd,imm
     InstructionCode=t[0]
     rd=t[1]
     imm=t[2]
-    s=binary_functions.BinaryConverter(imm)
-    if imm<0:
+    s=binary_functions.BinaryConverter((imm))
+    if int(imm)<0:
         s="1"*(32-len(s))+s
         s=s[0:20]+rd
     else:
@@ -259,7 +259,7 @@ def Btype(k,pc):
         result=s+registers_encoding[k[2]]+registers_encoding[k[1]]+funct3+s2+opcode
     elif k[0]=="blt":
         funct3="100"
-        result=s+" "+registers_encoding[k[2]]+" "+registers_encoding[k[1]]+" "+funct3+" "+s2+" "+opcode
+        result=s+registers_encoding[k[2]]+registers_encoding[k[1]]+funct3+s2+opcode
     elif k[0]=="bge":
         funct3="101"
         result=s+registers_encoding[k[2]]+registers_encoding[k[1]]+funct3+s2+opcode
@@ -294,7 +294,7 @@ def main_program():
     results = []
     hlt = "beq zero,zero,0x00000000"
     if data[-1]!=hlt:
-        print("Error: Line:",len(data),"-->VIrtual Halt not at last")
+        print("Error: Line:",len(data),"-->Virtual Halt not at last")
         return
     pc = 0
     for i in range(len(data)-1):
@@ -305,7 +305,7 @@ def main_program():
         elif data[i]=="\n":
             continue
         elif data[i] ==hlt:
-            print("Error at Line:",i+1,"-->VIrtual Halt twice")
+            print("Error at Line:",i+1,"-->Virtual Halt twice")
             return
         pc+=4
         
@@ -335,7 +335,7 @@ def main_program():
             results.append(ans_string)
             pc+=4   
 
-    with open("output.txt","w") as out:
+    with open("output.txt","w") as out: # w modes allows us to refresh output file 
         for i in results:
             if i==len(results)-1:
                 out.write(i)

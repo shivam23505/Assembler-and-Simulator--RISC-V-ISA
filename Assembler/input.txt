@@ -1,7 +1,11 @@
+<<<<<<< HEAD
 add ra,zero,sp
 sub t1,t2,s0 
 jal ra,hello
 sw ra,32(sp)
 hello:addi t1,t2,123
 sw ra,32(sp)
+=======
+lw a5,20(s1)
+>>>>>>> madhav
 beq zero,zero,0x00000000
