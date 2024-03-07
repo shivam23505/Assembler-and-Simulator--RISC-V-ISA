@@ -23,6 +23,7 @@ registers_encoding = {}
 for i in range(len(registers_list)):
     registers_encoding[registers_list[i]] = binary_functions.Binary_5_convert(i)
 
+Lables = {}
 ##############################################################################################################
     
 #Converting the S-type instructions into binary
@@ -220,11 +221,12 @@ def Rtype_error_checker(k):  # returns true if no error is found,k input string 
             tuple1 = (-1,-1,-1,-1)
             return tuple1
 
-def Jtype(t):
+def Jtype(t,pc):
     opcode = "1101111"
-    imm_binary = binary_functions.BinaryConverter(int(t[2]))
-    imm_binary = binary_functions.sign_extension(imm_binary,20)
-    bin_string = imm_binary[0] + imm_binary[10:] + imm_binary[10]+imm_binary[1:9]+ registers_encoding[t[1]] + opcode
+    destination = Lables[t[2]]-pc
+    imm_binary = binary_functions.BinaryConverter(destination)
+    imm_binary = binary_functions.sign_extension(imm_binary,21)
+    bin_string = imm_binary[0] + imm_binary[10:20] + imm_binary[9]+imm_binary[1:9]+ registers_encoding[t[1]] + opcode
     return bin_string
 
 def Jtype_error_checker(assembly_instruction):
@@ -236,15 +238,18 @@ def Jtype_error_checker(assembly_instruction):
         return t1
     if (x[0] not in registers_list):
         return t1
-    if int(x[1])<(-pow(2,20)) or int(x[1])>(pow(2,20)-1):
+    if x[1] not in Lables:
         return t1
+    # if int(x[1])<(-pow(2,20)) or int(x[1])>(pow(2,20)-1):
+    #     return t1
     return (assembly_instruction[0],x[0],x[1])
 
-def Btype(k):
-    s0=binary_functions.BinaryConverter(k[3])
+def Btype(k,pc):
+    destination = Lables[k[3]]-pc
+    s0=binary_functions.BinaryConverter(str(destination))
     s0 =binary_functions.sign_extension(s0,13)
     s=s0[0]+s0[2:8]
-    s2=s0[8:12]+s0[12]
+    s2=s0[8:12]+s0[1]
     opcode="1100011"
     if k[0]=="beq":
         funct3="000"
@@ -274,8 +279,10 @@ def B_error_checker(h):#eg:h=[inst,"t,imm"]
         return (-1,-1,-1,-1)
     if (y[0] not in registers_list) or (y[1] not in registers_list):
         return (-1,-1,-1,-1)
-    if int(y[2])<pow(-2,11) or int(y[2])>(pow(2,11)-1):
+    if y[2] not in Lables:
         return (-1,-1,-1,-1)
+    # if int(y[2])<pow(-2,11) or int(y[2])>(pow(2,11)-1):
+    #     return (-1,-1,-1,-1)
     return (h[0],y[0],y[1],y[2])
     
 def main_program():
@@ -283,7 +290,7 @@ def main_program():
         data = f.readlines()
     for i in data:
         i.strip()
-    Lables = {}
+    
     results = []
     hlt = "beq zero,zero,0x00000000"
     if data[-1]!=hlt:
@@ -316,11 +323,11 @@ def main_program():
             elif Stype_error_checker(k)[0]!=-1:
                 ans_string = Stype_instruction(Stype_error_checker(k))
             elif Jtype_error_checker(k)[0]!=-1:
-                ans_string = Jtype(Jtype_error_checker(k))
+                ans_string = Jtype(Jtype_error_checker(k),pc)
             elif uerror(k)[0]!=-1:
                 ans_string = UType(uerror(k))
-            #elif Btype_error_checker(k)[0]!=-1:
-            #    ans_string = Btype(k)
+            elif B_error_checker(k)[0]!=-1:
+                ans_string = Btype(B_error_checker(k),pc)
             else:
                 print("Error at line:",i+1,"Invalid Instruction")
                 return
