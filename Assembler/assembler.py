@@ -181,8 +181,8 @@ def Rtype(t):
    
     return s1
 
-def Rtype_error_checker(s):  # returns true if no error is found,k input string split around space
-        k = s.split()
+def Rtype_error_checker(k):  # returns true if no error is found,k input string split around space
+        
         flag = 0
         if(len(k)==2):
             parameters = k[1].split(",")
