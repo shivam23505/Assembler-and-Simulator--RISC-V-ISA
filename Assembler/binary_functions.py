@@ -29,7 +29,8 @@ def BinaryConverter(imm):
 def Binary_5_convert(num):
     s=""
     while num!=0:
-        s+=str(num%2)
+        m=str(num%2)
+        s = m+s
         num = num//2
     if (len(s)<5):
         m = "0"*(5-len(s))

@@ -177,7 +177,7 @@ def Rtype(t):
     rindex1 = str(registers_encoding[r1])
     rindex2 = str(registers_encoding[r2])
     rindexd = str(registers_encoding[rd])
-    s1 = func7 + rindex2 + rindex1 + func3+ rindexd + opcodedefault
+    s1 = func7 + rindex2 + rindex1+ func3 + rindexd+opcodedefault
    
     return s1
 
@@ -205,7 +205,7 @@ def Rtype_error_checker(k):  # returns true if no error is found,k input string 
             flag =1
         
         if(flag==0): # return in the form instruction code,rd,rs1,rs2
-            tuple1 = (k[0],parameters[0],parameters[1],parameters[2])
+            tuple1 = (k[0],parameters[0],parameters[1],parameters[2])#rd,rs1,rs2
             return tuple1
         
         if(flag==1):
