@@ -321,7 +321,7 @@ def B_error_checker(h):#eg:h=[inst,"t,imm"]
     x=y[0].split(",")
     if len(x)!=2:
         return (-1,-1,-1,-1)
-    if x[0] and x[1] not in [registers_list[6],registers_list[7]]:
+    if x[0] and x[1] not in registers_list:
         return (-1,-1,-1,-1)
     if int(y[1])<=pow(-2,11) or int(y[1])>(pow(2,11)-1):
         return (-1,-1,-1,-1)
