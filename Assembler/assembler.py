@@ -56,7 +56,7 @@ def Stype_error_checker(assembly_instruction):
 
     if source_reg1 not in registers_list or source_reg2 not in registers_list:
         return t1
-    if int(immediate_val)<=pow(-2,11) or int(immediate_val)>(pow(2,11)-1):
+    if int(immediate_val)<pow(-2,11) or int(immediate_val)>(pow(2,11)-1):
         return t1
     return (assembly_instruction[0],source_reg1,source_reg2,immediate_val)
 
@@ -240,6 +240,44 @@ def Jtype_error_checker(assembly_instruction):
         return t1
     return (assembly_instruction[0],x[0],x[1])
 
+def Btype(k):
+    s0=binary_functions.BinaryConverter(k[3])
+    s0 =binary_functions.sign_extension(s0,13)
+    s=s0[0]+s0[2:8]
+    s2=s0[8:12]+s0[12]
+    opcode="1100011"
+    if k[0]=="beq":
+        funct3="000"
+        result=s+registers_encoding[k[2]]+registers_encoding[k[1]]+funct3+s2+opcode
+    elif k[0]=="bne":
+        funct3="001"
+        result=s+registers_encoding[k[2]]+registers_encoding[k[1]]+funct3+s2+opcode
+    elif k[0]=="blt":
+        funct3="100"
+        result=s+" "+registers_encoding[k[2]]+" "+registers_encoding[k[1]]+" "+funct3+" "+s2+" "+opcode
+    elif k[0]=="bge":
+        funct3="101"
+        result=s+registers_encoding[k[2]]+registers_encoding[k[1]]+funct3+s2+opcode
+    elif k[0]=="bltu":
+        funct3="110"
+        result=s+registers_encoding[k[2]]+registers_encoding[k[1]]+funct3+s2+opcode
+    elif k[0]=="bgeu":
+        funct3="111"
+        result=s+registers_encoding[k[2]]+registers_encoding[k[1]]+funct3+s2+opcode
+    return result
+
+def B_error_checker(h):#eg:h=[inst,"t,imm"]
+    if h[0] not in B_type_instructions:
+        return (-1,-1,-1,-1)
+    y=h[1].split(",")
+    if len(y)!=3:
+        return (-1,-1,-1,-1)
+    if (y[0] not in registers_list) or (y[1] not in registers_list):
+        return (-1,-1,-1,-1)
+    if int(y[2])<pow(-2,11) or int(y[2])>(pow(2,11)-1):
+        return (-1,-1,-1,-1)
+    return (h[0],y[0],y[1],y[2])
+    
 def main_program():
     with open("input.txt") as f:
         data = f.readlines()
@@ -296,6 +334,5 @@ def main_program():
                 out.write(i)
             else:
                 out.write(i+"\n")
-    print(Lables)
-        
+    
 main_program()
