@@ -230,3 +230,63 @@ def Jtype_error_checker(assembly_instruction):
     if int(x[1])<(-pow(2,20)) or int(x[1])>(pow(2,20)-1):
         return t1
     return (assembly_instruction[0],x[0],x[1])
+
+def main_program():
+    with open("input.txt") as f:
+        data = f.readlines()
+    for i in data:
+        i.strip()
+    Lables = {}
+    results = []
+    hlt = "beq zero,zero,0x00000000"
+    if data[-1]!=hlt:
+        print("Error: Line:",len(data),"-->VIrtual Halt not at last")
+        return
+    pc = 0
+    for i in range(len(data)-1):
+        if (":" in data[i]):
+            current_label = data[i][:(data[i].find(":"))]
+            data[i] = data[i][data[i].find(":")+1:]
+            Lables[current_label] = pc
+        elif data[i]=="\n":
+            continue
+        elif data[i] ==hlt:
+            print("Error at Line:",i+1,"-->VIrtual Halt twice")
+            return
+        pc+=4
+        
+    pc  = 0
+    for i in range(len(data)-1):
+        if data[i]=="\n":
+            pass
+        else:
+            k  = data[i].split()
+            ans_string = ""
+            if Rtype_error_checker(k)[0]!=-1:
+                ans_string  = Rtype(Rtype_error_checker(k))
+            elif ierror(k)[0]!=-1:
+                ans_string = Itype(ierror(k))
+            elif Stype_error_checker(k)[0]!=-1:
+                ans_string = Stype_instruction(Stype_error_checker(k))
+            elif Jtype_error_checker(k)[0]!=-1:
+                ans_string = Jtype(Jtype_error_checker(k))
+            elif uerror(k)[0]!=-1:
+                ans_string = UType(uerror(k))
+            #elif Btype_error_checker(k)[0]!=-1:
+            #    ans_string = Btype(k)
+            else:
+                print("Error at line:",i+1,"Invalid Instruction")
+                return
+
+            results.append(ans_string)
+            pc+=4   
+
+    with open("output.txt","a") as out:
+        for i in results:
+            if i==len(results)-1:
+                out.write(i)
+            else:
+                out.write(i+"\n")
+    print(Lables)
+        
+main_program()
