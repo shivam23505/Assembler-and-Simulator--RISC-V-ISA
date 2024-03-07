@@ -129,7 +129,12 @@ def Itype(InstructionCode,rd,rs,imm):
     elif InstructionCode=="jalr":
         finalbin=s+rs+"000"+rd+"1100111"
     return finalbin
-def Rtype(instruction,r2,r1,rd): 
+
+def Rtype(t):  
+    instruction=t[0]
+    rd=t[1]
+    r1=t[2]
+    r2 = t[3]
     #func7,r2,r1,func3,rd are strings
     opcodedefault = "0110011" # since it is same for all Rtype
     func3 ="";
