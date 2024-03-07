@@ -33,7 +33,7 @@ def Stype_instruction(t):
     opcode = "0100011"
     funct3 = "010"
     imm_binary = binary_functions.BinaryConverter(int(t[3]))
-    bin_string = imm_binary[:8] + registers_encoding[t[2]] + registers_encoding[t[1]] + funct3 + imm_binary[8:] + opcode
+    bin_string = imm_binary[:7] + registers_encoding[t[1]] + registers_encoding[t[2]] + funct3 + imm_binary[7:] + opcode
     return bin_string
 
 #To check the credibility of Stype instruction
