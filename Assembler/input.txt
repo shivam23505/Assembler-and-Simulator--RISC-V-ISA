@@ -1,2 +1,2 @@
-add s1,s2,s3
+lw a5,20(s1)
 beq zero,zero,0x00000000
