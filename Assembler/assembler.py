@@ -290,3 +290,41 @@ def main_program():
     print(Lables)
         
 main_program()
+def Btype(inst,t,imm):
+    s0=binary_functions.BinaryConverter(imm)
+    s=s0[12]+s0[10:4:-1]
+    s2=s0[11]+s0[4:0:-1]
+    opcode="1100011"
+    if inst=="beq":
+        funct3="000"
+        result=s+t[1]+t[0]+funct3+s2+opcode
+    elif inst=="bne":
+        funct3="001"
+        result=s+t[1]+t[0]+funct3+s2+opcode
+    elif inst=="blt":
+        funct3="100"
+        result=s+t[1]+t[0]+funct3+s2+opcode
+    elif inst=="bge":
+        funct3="101"
+        result=s+t[1]+t[0]+funct3+s2+opcode
+    elif inst=="bltu":
+        funct3="110"
+        result=s+t[1]+t[0]+funct3+s2+opcode
+    elif inst=="bgeu":
+        funct3="111"
+        result=s+t[1]+t[0]+funct3+s2+opcode
+    return result
+def B_error_checker(h):#eg:h=[inst,"t,imm"]
+    if h[0] not in ["beq","bne","blt","bge","bltu","bgeu"]:
+        return (-1,-1,-1,-1)
+    y=h[1].split(",")
+    x=y[0].split(",")
+    if len(x)!=2:
+        return (-1,-1,-1,-1)
+    if x[0] and x[1] not in [registers_list[6],registers_list[7]]:
+        return (-1,-1,-1,-1)
+    if int(y[1])<=pow(-2,11) or int(y[1])>(pow(2,11)-1):
+        return (-1,-1,-1,-1)
+    return (h[0],[x[0],x[1]],y[1])
+    
+        
