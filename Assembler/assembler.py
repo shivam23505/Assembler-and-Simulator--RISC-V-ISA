@@ -99,7 +99,7 @@ def uerror(k):#k=["instruction code","rd,imm"]
             return (-1,-1,-1,-1)
         if x[0] not in registers_list:
             return (-1,-1,-1,-1)
-        if int(x[1])<pow(-2,11) or int(x[1])>(pow(2,11)-1):
+        if int(x[1])<pow(-2,31) or int(x[1])>(pow(2,31)-1):
             return (-1,-1,-1,-1)
     return (k[0],registers_encoding[x[0]],int(x[1]))
 def UType(t):#InstructionCode,rd,imm
@@ -223,7 +223,10 @@ def Rtype_error_checker(k):  # returns true if no error is found,k input string 
 
 def Jtype(t,pc):
     opcode = "1101111"
-    destination = Lables[t[2]]-pc
+    if (t[2].isalpha()==False):
+        destination  = t[2]
+    else:
+        destination = Lables[t[2]]-pc
     imm_binary = binary_functions.BinaryConverter(destination)
     imm_binary = binary_functions.sign_extension(imm_binary,21)
     bin_string = imm_binary[0] + imm_binary[10:20] + imm_binary[9]+imm_binary[1:9]+ registers_encoding[t[1]] + opcode
@@ -238,14 +241,19 @@ def Jtype_error_checker(assembly_instruction):
         return t1
     if (x[0] not in registers_list):
         return t1
-    if x[1] not in Lables:
-        return t1
-    # if int(x[1])<(-pow(2,20)) or int(x[1])>(pow(2,20)-1):
-    #     return t1
+    if x[1].isalpha():
+        if x[1] not in Lables:
+            return t1
+    else:
+        if int(x[1])<(-pow(2,20)) or int(x[1])>(pow(2,20)-1):
+            return t1
     return (assembly_instruction[0],x[0],x[1])
 
 def Btype(k,pc):
-    destination = Lables[k[3]]-pc
+    if k[3].isalpha()==False:
+        destination = int(k[3])
+    else:
+        destination = Lables[k[3]]-pc
     s0=binary_functions.BinaryConverter(str(destination))
     s0 =binary_functions.sign_extension(s0,13)
     s=s0[0]+s0[2:8]
@@ -277,12 +285,14 @@ def B_error_checker(h):#eg:h=[inst,"t,imm"]
     y=h[1].split(",")
     if len(y)!=3:
         return (-1,-1,-1,-1)
-    if (y[0] not in registers_list) or (y[1] not in registers_list):
-        return (-1,-1,-1,-1)
-    if y[2] not in Lables:
-        return (-1,-1,-1,-1)
-    # if int(y[2])<pow(-2,11) or int(y[2])>(pow(2,11)-1):
-    #     return (-1,-1,-1,-1)
+    if y[2].isalpha():
+        if (y[0] not in registers_list) or (y[1] not in registers_list):
+            return (-1,-1,-1,-1)
+        if y[2] not in Lables:
+            return (-1,-1,-1,-1)
+    else:
+        if int(y[2])<pow(-2,11) or int(y[2])>(pow(2,11)-1):
+            return (-1,-1,-1,-1)
     return (h[0],y[0],y[1],y[2])
     
 def main_program():
@@ -293,6 +303,7 @@ def main_program():
     
     results = []
     hlt = "beq zero,zero,0"
+    hlt_binary = "00000000000000000000000001100011"
     if data[-1]!=hlt:
         print("Error: Line:",len(data),"-->Virtual Halt not at last")
         return
@@ -337,9 +348,6 @@ def main_program():
 
     with open("output.txt","w") as out: # w modes allows us to refresh output file 
         for i in results:
-            if i==len(results)-1:
-                out.write(i)
-            else:
-                out.write(i+"\n")
-    
+            out.write(i+"\n")
+        out.write(hlt_binary)
 main_program()
