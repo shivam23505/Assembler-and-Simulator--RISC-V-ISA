@@ -292,7 +292,7 @@ def main_program():
         i.strip()
     
     results = []
-    hlt = "beq zero,zero,0x00000000"
+    hlt = "beq zero,zero,0"
     if data[-1]!=hlt:
         print("Error: Line:",len(data),"-->Virtual Halt not at last")
         return
