@@ -1,2 +1,2 @@
-lw a5,20(s1)
-beq zero,zero,0x00000000
+halt
+beq zero,zero,0
