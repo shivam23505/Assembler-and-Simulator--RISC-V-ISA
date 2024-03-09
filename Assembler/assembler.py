@@ -326,5 +326,27 @@ def B_error_checker(h):#eg:h=[inst,"t,imm"]
     if int(y[1])<=pow(-2,11) or int(y[1])>(pow(2,11)-1):
         return (-1,-1,-1,-1)
     return (h[0],[x[0],x[1]],y[1])
+def bonus_type(t):
+    instructions=t[0]
+    rd=t[1]
+    rs1=t[2]
+    opcode="0011111"
+    rdindex=str(registers_encoding[rd])
+    rs1index=str(registers_encoding[rs1])
+    if instructions =="rst":
+        result= "0000000000000000000000000" + opcode
+    if instructions =="rvrs":
+        result= "000000000000" + rs1index +"000"+ rdindex + opcode
+    return result
+def bonus_error(k):# k=["instructions","register1,register2"]
+    if k[0] not in ["rvrs"]:
+        return (-1,-1,-1,-1)
+    x=k[1].split(",")
+    if len(x)!=2:
+        return (-1,-1,-1,-1)
+    if x[0] and x[1] not in registers_list:
+        return (-1,-1,-1,-1)
     
+     
+        
         
