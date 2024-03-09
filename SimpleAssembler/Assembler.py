@@ -1,7 +1,7 @@
 # Assembler for RISC-V ISA 
 import math
 import binary_functions
-
+import sys
 #############################################################################################################
 R_type_instructions  = ["add","sub","sll","slt","sltu","xor","srl","or","and"]
 I_type_instructions  = ["lw","addi","sltiu","jalr"]
@@ -295,8 +295,8 @@ def B_error_checker(h):#eg:h=[inst,"t,imm"]
             return (-1,-1,-1,-1)
     return (h[0],y[0],y[1],y[2])
     
-def main_program():
-    with open("input.txt") as f:
+def main_program(input_path,output_path):
+    with open(input_path) as f:
         data = f.readlines()
     for i in data:
         i.strip()
@@ -346,8 +346,17 @@ def main_program():
             results.append(ans_string)
             pc+=4   
 
-    with open("output.txt","w") as out: # w modes allows us to refresh output file 
+    with open(output_path,"w") as out: # w modes allows us to refresh output file 
         for i in results:
             out.write(i+"\n")
         out.write(hlt_binary)
-main_program()
+
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Usage: python3 Filename.py input_file_path output_file_path")
+        sys.exit(1)
+
+    input_path = sys.argv[1]
+    output_path = sys.argv[2]
+
+    main_program(input_path, output_path)
