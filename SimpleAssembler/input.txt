@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 slt t4,t1,t0
 lui t0,-100
 addi s0,gp,100
@@ -16,3 +17,12 @@ beq zero,zero,0
 halt
 beq zero,zero,0
 >>>>>>> madhav
+=======
+add ra,zero,sp
+sub t1,t2,s0 
+hello:jal ra,-1024
+sw ra,32(sp)
+
+sw ra,32(sp)
+beq zero,zero,0x00000000
+>>>>>>> mantavya
