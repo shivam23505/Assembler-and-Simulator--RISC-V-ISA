@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 slt t4,t1,t0
 lui t0,-100
 addi s0,gp,100
@@ -11,3 +12,7 @@ sll s7,t0,t1
 srl s1,t6,t4
 or s9,s10,t6
 beq zero,zero,0
+=======
+halt
+beq zero,zero,0
+>>>>>>> madhav
