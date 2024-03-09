@@ -303,25 +303,20 @@ def main_program(input_path,output_path):
     
     results = []
     hlt = "beq zero,zero,0"
-    hlt_binary = "00000000000000000000000001100011"
-    if data[-1]!=hlt:
-        print("Error: Line:",len(data),"-->Virtual Halt not at last")
-        return
     pc = 0
-    for i in range(len(data)-1):
+    for i in range(len(data)):
         if (":" in data[i]):
             current_label = data[i][:(data[i].find(":"))]
             data[i] = data[i][data[i].find(":")+1:]
             Lables[current_label] = pc
         elif data[i]=="\n":
             continue
-        elif data[i] ==hlt:
-            print("Error at Line:",i+1,"-->Virtual Halt twice")
-            return
         pc+=4
-        
+    flag = 0    
     pc  = 0
-    for i in range(len(data)-1):
+    for i in range(len(data)):
+        if hlt in data[i]:
+            flag=1
         if data[i]=="\n":
             pass
         else:
@@ -345,11 +340,12 @@ def main_program(input_path,output_path):
 
             results.append(ans_string)
             pc+=4   
-
+    if flag==0:
+        print("ERROR: Virtual Hlt Missing")
+        return
     with open(output_path,"w") as out: # w modes allows us to refresh output file 
         for i in results:
             out.write(i+"\n")
-        out.write(hlt_binary)
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
@@ -360,3 +356,4 @@ if __name__ == "__main__":
     output_path = sys.argv[2]
 
     main_program(input_path, output_path)
+
