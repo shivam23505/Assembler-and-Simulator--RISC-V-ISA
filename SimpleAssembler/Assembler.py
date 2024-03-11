@@ -28,7 +28,7 @@ def BinaryConverter(imm):
         if(len(s)<32):
             m="0"*(32-len(s))
             s=m+s
-    return s
+    return s[20:]
 
 #converts number into 5-bit binary
 #returns 5-bit binary string
