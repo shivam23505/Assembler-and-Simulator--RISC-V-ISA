@@ -58,7 +58,7 @@ def Stype_error_checker(assembly_instruction):
 
     if source_reg1 not in registers_list or source_reg2 not in registers_list:
         return t1
-    if int(immediate_val)<pow(-2,31) or int(immediate_val)>(pow(2,31)-1):
+    if int(immediate_val)<pow(-2,11) or int(immediate_val)>(pow(2,11)-1):
         return t1
     return (assembly_instruction[0],source_reg1,source_reg2,immediate_val)
 
@@ -90,7 +90,7 @@ def ierror(k):#k=["instruction_code","rd,rs,imm"]
                 return (-1,-1,-1,-1)
            if x[1] not in registers_list:
                 return (-1,-1,-1,-1)
-           if int(x[2])<=pow(-2,31) or int(x[2])>(pow(2,31)-1):
+           if int(x[2])<=pow(-2,11) or int(x[2])>(pow(2,11)-1):
                 return (-1,-1,-1,-1)
         return (k[0],registers_encoding[x[0]],registers_encoding[x[1]],x[2])
     else:
@@ -292,6 +292,10 @@ def Jtype(t,pc):
     return bin_string
 
 def Jtype_error_checker(assembly_instruction):
+    if(assembly_instruction[1].find("(")!=-1):
+        assembly_instruction[1] = assembly_instruction[1][:assembly_instruction[1].find("(")]
+        
+        
     t1=(-1,-1,-1,-1)
     if assembly_instruction[0]!="jal":
         return t1
@@ -304,7 +308,7 @@ def Jtype_error_checker(assembly_instruction):
         if x[1] not in Lables:
             return t1
     else:
-        if int(x[1])<(-pow(2,31)) or int(x[1])>(pow(2,31)-1):
+        if int(x[1])<(-pow(2,20)) or int(x[1])>(pow(2,20)-1):
             return t1
     return (assembly_instruction[0],x[0],x[1])
 
@@ -355,27 +359,6 @@ def B_error_checker(h):#eg:h=[inst,"t,imm"]
             return (-1,-1,-1,-1)
     return (h[0],y[0],y[1],y[2])
     
-
-def bonus_type(t):
-    rd=t[1]
-    rs1=t[2]
-    opcode="0011111"
-    rdindex=str(registers_encoding[rd])
-    rs1index=str(registers_encoding[rs1])
-    result= "000000000000" + rs1index +"000"+ rdindex + opcode
-    return result
-
-def bonus_error(k):# k=["instructions","register1,register2"]
-    if k[0] not in ["rvrs"]:
-        return (-1,-1,-1,-1)
-    x=k[1].split(",")
-    if len(x)!=2:
-        return (-1,-1,-1,-1)
-    if x[0] not in registers_list and x[1] not in registers_list:
-        return (-1,-1,-1,-1)
-    return (k[0],x[0],x[1])   
-     
-        
 def main_program(input_path,output_path):
     with open(input_path) as f:
         data = f.readlines()
@@ -407,15 +390,15 @@ def main_program(input_path,output_path):
             k  = data[i].split()
             ans_string = ""
             if(k[0]=="halt"):
-                ans_string= "1"*32
-            elif k[0]=="rst":
-                ans_string = "0"*32
-            elif bonus_error(k)[0]!=-1:
-                ans_string=bonus_type(bonus_error(k))
+               
+                ans_string= "11111111111111111111111111111111"
+            
             elif Rtype_error_checker(k)[0]!=-1:
                 ans_string  = Rtype(Rtype_error_checker(k))
             elif mulerrorchecker(k)[0]!=-1:
                 ans_string  = mulconvert(mulerrorchecker(k))
+                
+            
             elif ierror(k)[0]!=-1:
                 ans_string = Itype(ierror(k))
             elif Stype_error_checker(k)[0]!=-1:
