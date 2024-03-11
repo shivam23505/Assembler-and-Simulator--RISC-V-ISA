@@ -2,7 +2,7 @@
 #Return 12 BIT binary string
 def BinaryConverter(imm):
     imm=int(imm)
-    x=(pow(2,11))
+    x=(pow(2,31))
     if imm<0:
         imm=x+imm
         s=""
@@ -10,8 +10,8 @@ def BinaryConverter(imm):
             s+=str(imm%2)
             imm=imm//2
         s=s[::-1]
-        if(len(s)<12):
-            m="1"*(12-len(s))
+        if(len(s)<32):
+            m="1"*(32-len(s))
             s=m+s
     else:
         s=""
@@ -19,10 +19,10 @@ def BinaryConverter(imm):
             s+=str(imm%2)
             imm=imm//2
         s=s[::-1]
-        if(len(s)<12):
-            m="0"*(12-len(s))
+        if(len(s)<32):
+            m="0"*(32-len(s))
             s=m+s
-    return s
+    return s[20:]
 
 #converts number into 5-bit binary
 #returns 5-bit binary string
