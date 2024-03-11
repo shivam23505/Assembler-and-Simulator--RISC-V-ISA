@@ -58,7 +58,7 @@ def Stype_error_checker(assembly_instruction):
 
     if source_reg1 not in registers_list or source_reg2 not in registers_list:
         return t1
-    if int(immediate_val)<pow(-2,11) or int(immediate_val)>(pow(2,11)-1):
+    if int(immediate_val)<pow(-2,31) or int(immediate_val)>(pow(2,31)-1):
         return t1
     return (assembly_instruction[0],source_reg1,source_reg2,immediate_val)
 
@@ -90,7 +90,7 @@ def ierror(k):#k=["instruction_code","rd,rs,imm"]
                 return (-1,-1,-1,-1)
            if x[1] not in registers_list:
                 return (-1,-1,-1,-1)
-           if int(x[2])<=pow(-2,11) or int(x[2])>(pow(2,11)-1):
+           if int(x[2])<=pow(-2,31) or int(x[2])>(pow(2,31)-1):
                 return (-1,-1,-1,-1)
         return (k[0],registers_encoding[x[0]],registers_encoding[x[1]],x[2])
     else:
@@ -304,7 +304,7 @@ def Jtype_error_checker(assembly_instruction):
         if x[1] not in Lables:
             return t1
     else:
-        if int(x[1])<(-pow(2,20)) or int(x[1])>(pow(2,20)-1):
+        if int(x[1])<(-pow(2,31)) or int(x[1])>(pow(2,31)-1):
             return t1
     return (assembly_instruction[0],x[0],x[1])
 
