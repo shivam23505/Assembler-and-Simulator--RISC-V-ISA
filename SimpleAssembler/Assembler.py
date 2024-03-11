@@ -392,7 +392,7 @@ def main_program(input_path,output_path):
             k  = data[i].split()
             ans_string = ""
             
-            if(k[0]!= "halt" and k[0] !="reset"):
+            if(k[0]!= "halt" and k[0] !="reset" and len(k)<2):
                  print("Error at line:",i+1,"Invalid Instruction")
                  return
                 
