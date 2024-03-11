@@ -8,7 +8,7 @@ import sys
 #Return 12 BIT binary string
 def BinaryConverter(imm):
     imm=int(imm)
-    x=(pow(2,11))
+    x=(pow(2,31))
     if imm<0:
         imm=x+imm
         s=""
@@ -16,8 +16,8 @@ def BinaryConverter(imm):
             s+=str(imm%2)
             imm=imm//2
         s=s[::-1]
-        if(len(s)<12):
-            m="1"*(12-len(s))
+        if(len(s)<32):
+            m="1"*(32-len(s))
             s=m+s
     else:
         s=""
@@ -25,8 +25,8 @@ def BinaryConverter(imm):
             s+=str(imm%2)
             imm=imm//2
         s=s[::-1]
-        if(len(s)<12):
-            m="0"*(12-len(s))
+        if(len(s)<32):
+            m="0"*(32-len(s))
             s=m+s
     return s
 
@@ -133,7 +133,7 @@ def ierror(k):#k=["instruction_code","rd,rs,imm"]
                 return (-1,-1,-1,-1)
             else:
                  imm=x[1][0:z]
-                 if int(imm)<=pow(-2,11) or int(imm)>(pow(2,11)-1):
+                 if int(imm)<=pow(-2,31) or int(imm)>(pow(2,31)-1):
                     return (-1,-1,-1,-1)
                  rs=x[1][z+1:x[1].find(")")]
                  if rs not in registers_list:
@@ -146,7 +146,7 @@ def ierror(k):#k=["instruction_code","rd,rs,imm"]
                 return (-1,-1,-1,-1)
            if x[1] not in registers_list:
                 return (-1,-1,-1,-1)
-           if int(x[2])<=pow(-2,11) or int(x[2])>(pow(2,11)-1):
+           if int(x[2])<=pow(-2,31) or int(x[2])>(pow(2,31)-1):
                 return (-1,-1,-1,-1)
         return (k[0],registers_encoding[x[0]],registers_encoding[x[1]],x[2])
     else:
@@ -413,7 +413,7 @@ def B_error_checker(h):#eg:h=[inst,"t,imm"]
         if y[2] not in Lables:
             return (-1,-1,-1,-1)
     else:
-        if int(y[2])<pow(-2,11) or int(y[2])>(pow(2,11)-1):
+        if int(y[2])<pow(-2,31) or int(y[2])>(pow(2,31)-1):
             return (-1,-1,-1,-1)
     return (h[0],y[0],y[1],y[2])
     
