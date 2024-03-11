@@ -66,6 +66,13 @@ def ierror(k):#k=["instruction_code","rd,rs,imm"]
     
     if(len(k)==2):
         x=k[1].split(",")
+        if(k[0] == "lw" and len(x) !=2):
+            return (-1,-1,-1,-1)
+        
+        if(k[0] != "lw"  and len(x) !=3):
+            return (-1,-1,-1,-1)
+        
+        
         if k[0] not in ["lw","addi","sltiu","jalr"]:
              return (-1,-1,-1,-1)
         elif k[0]=="lw":
@@ -201,7 +208,7 @@ def Rtype(t):
 def Rtype_error_checker(k):  # returns true if no error is found,k input string split around space
         
         flag = 0
-        if(len(k)==2):
+        if(len(k)==2) :
             parameters = k[1].split(",")
             for i in parameters: # checks if all registers passed valid
                 if(str(i) in registers_list):
@@ -344,6 +351,8 @@ def Btype(k,pc):
     return result
 
 def B_error_checker(h):#eg:h=[inst,"t,imm"]
+    
+    
     if h[0] not in B_type_instructions:
         return (-1,-1,-1,-1)
     y=h[1].split(",")
@@ -392,7 +401,7 @@ def main_program(input_path,output_path):
             k  = data[i].split()
             ans_string = ""
             
-            if(k[0]!= "halt" and k[0] !="reset" and len(k)<2):
+            if(k[0]!= "halt" and k[0] !="reset" and len(k)!=2):
                  print("Error at line:",i+1,"Invalid Instruction")
                  return
                 
