@@ -387,8 +387,17 @@ def main_program(input_path,output_path):
             pass
         else:
             
+            
+            
             k  = data[i].split()
             ans_string = ""
+            
+            if(k[0]!= "halt" and k[0] !="reset"):
+                 print("Error at line:",i+1,"Invalid Instruction")
+                 return
+                
+            
+            
             if(k[0]=="halt"):
                
                 ans_string= "11111111111111111111111111111111"
