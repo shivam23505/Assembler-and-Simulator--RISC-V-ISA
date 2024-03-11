@@ -1,8 +1,57 @@
 
     # Assembler for RISC-V ISA 
 import math
-import binary_functions
+
 import sys
+
+#Converting imm to 2's complement
+#Return 12 BIT binary string
+def BinaryConverter(imm):
+    imm=int(imm)
+    x=(pow(2,11))
+    if imm<0:
+        imm=x+imm
+        s=""
+        while imm!=0:
+            s+=str(imm%2)
+            imm=imm//2
+        s=s[::-1]
+        if(len(s)<12):
+            m="1"*(12-len(s))
+            s=m+s
+    else:
+        s=""
+        while imm!=0:
+            s+=str(imm%2)
+            imm=imm//2
+        s=s[::-1]
+        if(len(s)<12):
+            m="0"*(12-len(s))
+            s=m+s
+    return s
+
+#converts number into 5-bit binary
+#returns 5-bit binary string
+def Binary_5_convert(num):
+    s=""
+    while num!=0:
+        m=str(num%2)
+        s = m+s
+        num = num//2
+    if (len(s)<5):
+        m = "0"*(5-len(s))
+        s= m + s
+    return s
+
+def sign_extension(bin_string,final_length):
+    temp = final_length - len(bin_string)
+    if bin_string[0]=="1":
+        bin_string = "1"*temp + bin_string
+    else:
+        bin_string = "0"*temp + bin_string
+    return bin_string
+    
+
 #############################################################################################################
 R_type_instructions  = ["add","sub","sll","slt","sltu","xor","srl","or","and"]
 I_type_instructions  = ["lw","addi","sltiu","jalr"]
@@ -22,7 +71,7 @@ for i in range(3,7):
 #The binary codes of all the registers required
 registers_encoding = {}
 for i in range(len(registers_list)):
-    registers_encoding[registers_list[i]] = binary_functions.Binary_5_convert(i)
+    registers_encoding[registers_list[i]] =Binary_5_convert(i)
 
 Lables = {}
 ##############################################################################################################
@@ -33,7 +82,7 @@ Lables = {}
 def Stype_instruction(t):
     opcode = "0100011"
     funct3 = "010"
-    imm_binary = binary_functions.BinaryConverter(int(t[3]))
+    imm_binary = BinaryConverter(int(t[3]))
     bin_string = imm_binary[:7] + registers_encoding[t[1]] + registers_encoding[t[2]] + funct3 + imm_binary[7:] + opcode
     return bin_string
 
@@ -121,7 +170,7 @@ def UType(t):#InstructionCode,rd,imm
     InstructionCode=t[0]
     rd=t[1]
     imm=t[2]
-    s=binary_functions.BinaryConverter((imm))
+    s=BinaryConverter((imm))
     if int(imm)<0:
         s="1"*(32-len(s))+s
         s=s[0:20]+rd
@@ -142,7 +191,7 @@ def Itype(t):#InstructionCode,rd,rs,imm
     rd=t[1]
     rs=t[2]
     imm=t[3]
-    s=binary_functions.BinaryConverter(imm)
+    s=BinaryConverter(imm)
     finalbin=""
     if InstructionCode=="lw":
         finalbin=s+rs+"010"+rd+"0000011"
@@ -293,8 +342,8 @@ def Jtype(t,pc):
         destination  = t[2]
     else:
         destination = Lables[t[2]]-pc
-    imm_binary = binary_functions.BinaryConverter(destination)
-    imm_binary = binary_functions.sign_extension(imm_binary,21)
+    imm_binary = BinaryConverter(destination)
+    imm_binary = sign_extension(imm_binary,21)
     bin_string = imm_binary[0] + imm_binary[10:20] + imm_binary[9]+imm_binary[1:9]+ registers_encoding[t[1]] + opcode
     return bin_string
 
@@ -325,8 +374,8 @@ def Btype(k,pc):
         destination = int(k[3])
     else:
         destination = Lables[k[3]]-pc
-    s0=binary_functions.BinaryConverter(str(destination))
-    s0 =binary_functions.sign_extension(s0,13)
+    s0=BinaryConverter(str(destination))
+    s0 =sign_extension(s0,13)
     s=s0[0]+s0[2:8]
     s2=s0[8:12]+s0[1]
     opcode="1100011"
