@@ -1,8 +1,57 @@
 
     # Assembler for RISC-V ISA 
 import math
-import binary_functions
+
 import sys
+
+#Converting imm to 2's complement
+#Return 12 BIT binary string
+def BinaryConverter(imm):
+    imm=int(imm)
+    x=(pow(2,31))
+    if imm<0:
+        imm=x+imm
+        s=""
+        while imm!=0:
+            s+=str(imm%2)
+            imm=imm//2
+        s=s[::-1]
+        if(len(s)<32):
+            m="1"*(32-len(s))
+            s=m+s
+    else:
+        s=""
+        while imm!=0:
+            s+=str(imm%2)
+            imm=imm//2
+        s=s[::-1]
+        if(len(s)<32):
+            m="0"*(32-len(s))
+            s=m+s
+    return s[20:]
+
+#converts number into 5-bit binary
+#returns 5-bit binary string
+def Binary_5_convert(num):
+    s=""
+    while num!=0:
+        m=str(num%2)
+        s = m+s
+        num = num//2
+    if (len(s)<5):
+        m = "0"*(5-len(s))
+        s= m + s
+    return s
+
+def sign_extension(bin_string,final_length):
+    temp = final_length - len(bin_string)
+    if bin_string[0]=="1":
+        bin_string = "1"*temp + bin_string
+    else:
+        bin_string = "0"*temp + bin_string
+    return bin_string
+    
+
 #############################################################################################################
 R_type_instructions  = ["add","sub","sll","slt","sltu","xor","srl","or","and"]
 I_type_instructions  = ["lw","addi","sltiu","jalr"]
@@ -22,7 +71,7 @@ for i in range(3,7):
 #The binary codes of all the registers required
 registers_encoding = {}
 for i in range(len(registers_list)):
-    registers_encoding[registers_list[i]] = binary_functions.Binary_5_convert(i)
+    registers_encoding[registers_list[i]] =Binary_5_convert(i)
 
 Lables = {}
 ##############################################################################################################
@@ -33,7 +82,7 @@ Lables = {}
 def Stype_instruction(t):
     opcode = "0100011"
     funct3 = "010"
-    imm_binary = binary_functions.BinaryConverter(int(t[3]))
+    imm_binary = BinaryConverter(int(t[3]))
     bin_string = imm_binary[:7] + registers_encoding[t[1]] + registers_encoding[t[2]] + funct3 + imm_binary[7:] + opcode
     return bin_string
 
@@ -58,7 +107,7 @@ def Stype_error_checker(assembly_instruction):
 
     if source_reg1 not in registers_list or source_reg2 not in registers_list:
         return t1
-    if int(immediate_val)<pow(-2,31) or int(immediate_val)>(pow(2,31)-1):
+    if int(immediate_val)<pow(-2,11) or int(immediate_val)>(pow(2,11)-1):
         return t1
     return (assembly_instruction[0],source_reg1,source_reg2,immediate_val)
 
@@ -66,6 +115,13 @@ def ierror(k):#k=["instruction_code","rd,rs,imm"]
     
     if(len(k)==2):
         x=k[1].split(",")
+        if(k[0] == "lw" and len(x) !=2):
+            return (-1,-1,-1,-1)
+        
+        if(k[0] != "lw"  and len(x) !=3):
+            return (-1,-1,-1,-1)
+        
+        
         if k[0] not in ["lw","addi","sltiu","jalr"]:
              return (-1,-1,-1,-1)
         elif k[0]=="lw":
@@ -77,7 +133,7 @@ def ierror(k):#k=["instruction_code","rd,rs,imm"]
                 return (-1,-1,-1,-1)
             else:
                  imm=x[1][0:z]
-                 if int(imm)<=pow(-2,11) or int(imm)>(pow(2,11)-1):
+                 if int(imm)<=pow(-2,31) or int(imm)>(pow(2,31)-1):
                     return (-1,-1,-1,-1)
                  rs=x[1][z+1:x[1].find(")")]
                  if rs not in registers_list:
@@ -114,7 +170,7 @@ def UType(t):#InstructionCode,rd,imm
     InstructionCode=t[0]
     rd=t[1]
     imm=t[2]
-    s=binary_functions.BinaryConverter((imm))
+    s=BinaryConverter((imm))
     if int(imm)<0:
         s="1"*(32-len(s))+s
         s=s[0:20]+rd
@@ -135,7 +191,7 @@ def Itype(t):#InstructionCode,rd,rs,imm
     rd=t[1]
     rs=t[2]
     imm=t[3]
-    s=binary_functions.BinaryConverter(imm)
+    s=BinaryConverter(imm)
     finalbin=""
     if InstructionCode=="lw":
         finalbin=s+rs+"010"+rd+"0000011"
@@ -201,7 +257,7 @@ def Rtype(t):
 def Rtype_error_checker(k):  # returns true if no error is found,k input string split around space
         
         flag = 0
-        if(len(k)==2):
+        if(len(k)==2) :
             parameters = k[1].split(",")
             for i in parameters: # checks if all registers passed valid
                 if(str(i) in registers_list):
@@ -286,12 +342,16 @@ def Jtype(t,pc):
         destination  = t[2]
     else:
         destination = Lables[t[2]]-pc
-    imm_binary = binary_functions.BinaryConverter(destination)
-    imm_binary = binary_functions.sign_extension(imm_binary,21)
+    imm_binary = BinaryConverter(destination)
+    imm_binary = sign_extension(imm_binary,21)
     bin_string = imm_binary[0] + imm_binary[10:20] + imm_binary[9]+imm_binary[1:9]+ registers_encoding[t[1]] + opcode
     return bin_string
 
 def Jtype_error_checker(assembly_instruction):
+    if(assembly_instruction[1].find("(")!=-1):
+        assembly_instruction[1] = assembly_instruction[1][:assembly_instruction[1].find("(")]
+        
+        
     t1=(-1,-1,-1,-1)
     if assembly_instruction[0]!="jal":
         return t1
@@ -304,7 +364,7 @@ def Jtype_error_checker(assembly_instruction):
         if x[1] not in Lables:
             return t1
     else:
-        if int(x[1])<(-pow(2,31)) or int(x[1])>(pow(2,31)-1):
+        if int(x[1])<(-pow(2,20)) or int(x[1])>(pow(2,20)-1):
             return t1
     return (assembly_instruction[0],x[0],x[1])
 
@@ -314,8 +374,8 @@ def Btype(k,pc):
         destination = int(k[3])
     else:
         destination = Lables[k[3]]-pc
-    s0=binary_functions.BinaryConverter(str(destination))
-    s0 =binary_functions.sign_extension(s0,13)
+    s0=BinaryConverter(str(destination))
+    s0 =sign_extension(s0,13)
     s=s0[0]+s0[2:8]
     s2=s0[8:12]+s0[1]
     opcode="1100011"
@@ -340,6 +400,8 @@ def Btype(k,pc):
     return result
 
 def B_error_checker(h):#eg:h=[inst,"t,imm"]
+    
+    
     if h[0] not in B_type_instructions:
         return (-1,-1,-1,-1)
     y=h[1].split(",")
@@ -351,31 +413,10 @@ def B_error_checker(h):#eg:h=[inst,"t,imm"]
         if y[2] not in Lables:
             return (-1,-1,-1,-1)
     else:
-        if int(y[2])<pow(-2,11) or int(y[2])>(pow(2,11)-1):
+        if int(y[2])<pow(-2,31) or int(y[2])>(pow(2,31)-1):
             return (-1,-1,-1,-1)
     return (h[0],y[0],y[1],y[2])
     
-
-def bonus_type(t):
-    rd=t[1]
-    rs1=t[2]
-    opcode="0011111"
-    rdindex=str(registers_encoding[rd])
-    rs1index=str(registers_encoding[rs1])
-    result= "000000000000" + rs1index +"000"+ rdindex + opcode
-    return result
-
-def bonus_error(k):# k=["instructions","register1,register2"]
-    if k[0] not in ["rvrs"]:
-        return (-1,-1,-1,-1)
-    x=k[1].split(",")
-    if len(x)!=2:
-        return (-1,-1,-1,-1)
-    if x[0] not in registers_list and x[1] not in registers_list:
-        return (-1,-1,-1,-1)
-    return (k[0],x[0],x[1])   
-     
-        
 def main_program(input_path,output_path):
     with open(input_path) as f:
         data = f.readlines()
@@ -404,18 +445,27 @@ def main_program(input_path,output_path):
             pass
         else:
             
+            
+            
             k  = data[i].split()
             ans_string = ""
+            
+            if(k[0]!= "halt" and k[0] !="reset" and len(k)!=2):
+                 print("Error at line:",i+1,"Invalid Instruction")
+                 return
+                
+            
+            
             if(k[0]=="halt"):
-                ans_string= "1"*32
-            elif k[0]=="rst":
-                ans_string = "0"*32
-            elif bonus_error(k)[0]!=-1:
-                ans_string=bonus_type(bonus_error(k))
+               
+                ans_string= "11111111111111111111111111111111"
+            
             elif Rtype_error_checker(k)[0]!=-1:
                 ans_string  = Rtype(Rtype_error_checker(k))
             elif mulerrorchecker(k)[0]!=-1:
                 ans_string  = mulconvert(mulerrorchecker(k))
+                
+            
             elif ierror(k)[0]!=-1:
                 ans_string = Itype(ierror(k))
             elif Stype_error_checker(k)[0]!=-1:
