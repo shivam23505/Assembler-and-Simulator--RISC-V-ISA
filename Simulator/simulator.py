@@ -12,6 +12,40 @@ for i in memory_locations:
 
 #Registers dictionary to store the values of individual registers
 #Format-- Registers = {"5_bitbinary":"0b"+"32bit_binary"}
+import math
+def BinaryConverter(imm):
+    imm=int(imm)
+    x=(pow(2,31))
+    if imm<0:
+        imm=x+imm
+        s=""
+        while imm!=0:
+            s+=str(imm%2)
+            imm=imm//2
+        s=s[::-1]
+        if(len(s)<32):
+            m="1"*(32-len(s))
+            s=m+s
+    else:
+        s=""
+        while imm!=0:
+            s+=str(imm%2)
+            imm=imm//2
+        s=s[::-1]
+        if(len(s)<32):
+            m="0"*(32-len(s))
+            s=m+s
+    return s[20:]
+register={}
+#Defining register from 0 to 31
+for i in range(0,31):
+    register[BinaryConverter[i]]='0b'+'0'*32
+register[BinaryConverter[2]]='0b'+BinaryConverter(256)
+def binarytonumber(bin):
+    count=0
+    for i in range(0,31):
+        count=count+int(bin[i])*(pow(2,31-i))
+
 
 program_counter = 0
 def Jtype(binary_input):
