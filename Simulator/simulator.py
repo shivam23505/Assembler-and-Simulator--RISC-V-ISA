@@ -65,9 +65,13 @@ def itype(s):
     rd=s[11:6:-1]
     op=s[6:-1:-1]
     if op=="0000011":
-        register[rd]=memory_values[(binarytonumber(register[rs1[2:]]))+binarytonumber(imm)]
+        register[rd]=memory_values[(binarytonumber(register[rs1][2:]))+binarytonumber(imm)]
     elif op=="0010011":
-        register[rd]="0b"+BinaryConverter(binarytonumber(register[rs1[2:]])+binarytonumber(imm))
+        register[rd]="0b"+BinaryConverter(binarytonumber(register[rs1][2:])+binarytonumber(imm))
     else:
-        pc+=((binarytonumber(register["0b00111"]))+binarytonumber(imm))
+        x=((binarytonumber(register["00111"][2:]))+binarytonumber(imm))
+        if(x%2==0):
+            pc=pc+x
+        else:
+            pc=pc+x-1
     pc=pc+4
