@@ -1,3 +1,4 @@
+import math
 #SIMULATOR FOR RISC-ISA V
 opcode = {"Rtype":"0110011","Stype":"0100011","Btype":"1100011","Jtype":"1101111",
         "Utype":["0110111","0010111"],"Itype":["0000011","0010011","0010011","1100111"]}
@@ -7,12 +8,19 @@ memory_locations = ["0x00010000","0x00010004","0x00010008","0x0001000c","0x00010
                     "0x00010044","0x00010048","0x0001004c","0x00010050","0x00010054","0x00010058","0x0001005c","0x00010060","0x00010064",
                     "0x00010068","0x0001006c","0x00010070","0x00010074","0x00010078","0x0001007c"]
 memory_values = {}
+pc=0
 for i in memory_locations:
     memory_values[i] = "0b" + "0"*32
-
-#Registers dictionary to store the values of individual registers
-#Format-- Registers = {"5_bitbinary":"0b"+"32bit_binary"}
-import math
+def Binary_5_convert(num):
+    s=""
+    while num!=0:
+        m=str(num%2)
+        s = m+s
+        num = num//2
+    if (len(s)<5):
+        m = "0"*(5-len(s))
+        s= m + s
+    return s
 def BinaryConverter(imm):
     imm=int(imm)
     x=(pow(2,31))
@@ -35,27 +43,31 @@ def BinaryConverter(imm):
         if(len(s)<32):
             m="0"*(32-len(s))
             s=m+s
-    return s[20:]
+    return s
 register={}
 #Defining register from 0 to 31
 for i in range(0,31):
-    register[BinaryConverter[i]]='0b'+'0'*32
-register[BinaryConverter[2]]='0b'+BinaryConverter(256)
+    register[Binary_5_convert(i)]='0b'+'0'*32
+register[Binary_5_convert(2)]='0b'+BinaryConverter(256)
 def binarytonumber(bin):
     count=0
-    for i in range(0,31):
-        count=count+int(bin[i])*(pow(2,31-i))
-
-
-program_counter = 0
-def Jtype(binary_input):
-    global program_counter
-     
-
-
-#main 
-    #check by opcode
-    #individual functions
-    #change register/memory value
-    #update program counter
-    #until virtual halt
+    count=count+int(bin[0])*pow(2,len(bin)-1)*-1
+    for i in range(1,len(bin)):
+        count=count+int(bin[i])*(pow(2,len(bin)-1-i))
+    return count
+#print correct value of jalr in main
+def itype(s):
+    s=s[::-1]
+    global pc
+    imm=int(s[31:19:-1])
+    rs1=s[19:14:-1]
+    func=s[14:11:-1]
+    rd=s[11:6:-1]
+    op=s[6:-1:-1]
+    if op=="0000011":
+        register[rd]=memory_values[(binarytonumber(register[rs1[2:]]))+binarytonumber(imm)]
+    elif op=="0010011":
+        register[rd]="0b"+BinaryConverter(binarytonumber(register[rs1[2:]])+binarytonumber(imm))
+    else:
+        pc=binarytonumber(str(int(register["0b00111"])+binarytonumber(imm)))
+    pc=pc+4
