@@ -69,5 +69,5 @@ def itype(s):
     elif op=="0010011":
         register[rd]="0b"+BinaryConverter(binarytonumber(register[rs1[2:]])+binarytonumber(imm))
     else:
-        pc=binarytonumber(str(int(register["0b00111"])+binarytonumber(imm)))
+        pc+=((binarytonumber(register["0b00111"]))+binarytonumber(imm))
     pc=pc+4
