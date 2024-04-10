@@ -11,7 +11,9 @@ memory_values = {}
 pc=0
 for i in memory_locations:
     memory_values[i] = "0b" + "0"*32
-def Binary_5_convert(num):
+def Binary_5_convert(num): 
+    #num is integer
+    #returns binary_string
     s=""
     while num!=0:
         m=str(num%2)
@@ -22,6 +24,8 @@ def Binary_5_convert(num):
         s= m + s
     return s
 def BinaryConverter(imm):
+    #imm can be string or integer
+    #returns string
     imm=int(imm)
     x=(pow(2,31))
     if imm<0:
@@ -49,7 +53,10 @@ register={}
 for i in range(0,31):
     register[Binary_5_convert(i)]='0b'+'0'*32
 register[Binary_5_convert(2)]='0b'+BinaryConverter(256)
+
 def binarytonumber(bin):
+    #bin is binary_string
+    #returns the corresponding decimal
     count=0
     count=count+int(bin[0])*pow(2,len(bin)-1)*-1
     for i in range(1,len(bin)):
@@ -71,3 +78,29 @@ def itype(s):
     else:
         pc=binarytonumber(str(int(register["0b00111"])+binarytonumber(imm)))
     pc=pc+4
+
+def Stype(binary_input):
+    global pc
+    imm = binary_input[:7] + binary_input[-12:-7]
+    rs2 = binary_input[7:12]
+    rs1 = binary_input[12:17]
+    new_value = binarytonumber(register[rs1][2:]) + binarytonumber(imm)
+    memory_values[BinaryConverter(new_value)] = register[rs2] 
+    pc+=4
+
+def utype(binary_input):
+    opcode = binary_input[-7:]
+    rd = binary_input[-12:-7]
+    imm = binary_input[21:]+12*"0"
+    if opcode =="0110111":
+        new_value = BinaryConverter(pc + binarytonumber(imm))
+        register[rd] = "0b"+new_value
+    else:
+        register[rd] = "0b" + imm
+    pc+=4
+
+def jtype(binary_input):
+    rd = binary_input[-12:-7]
+    imm = binary_input[0]+binary_input[12:]+binary_input[11]+binary_input[1:11] +"0"
+    register[rd] ="0b" + BinaryConverter(pc+4)
+    pc = pc + binarytonumber(imm)
