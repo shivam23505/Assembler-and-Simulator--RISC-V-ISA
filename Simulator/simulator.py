@@ -242,7 +242,7 @@ def utype(binary_input):
     opcode = binary_input[-7:]
     rd = binary_input[-12:-7]
     imm = binary_input[-32:-12]+12*"0"
-    if opcode =="0110111":
+    if opcode =="0010111":
         new_value = BinaryConverter(pc + binarytonumber_two_complement(imm))
         register[rd] = "0b"+new_value
     else:
@@ -304,13 +304,12 @@ def main_program(input_path,output_path):
     global pc
     with open(input_path) as f:
         data = f.readlines()
-    for i in data:
-        i.strip()
+    for line in data:
+        line.strip()
     halt = "0"*25+"1100011"
     solutions = []
     curr_instruction = data[pc//4]
     curr_instruction = curr_instruction[:-1]
-    # print(curr_instruction)
     while (curr_instruction!=halt):
         print(pc)
         curr_opcode = curr_instruction[25:32]
@@ -329,8 +328,9 @@ def main_program(input_path,output_path):
 
         solutions.append(" ".join(print_reg_values()))
         curr_instruction = data[pc//4]
-        curr_instruction = curr_instruction[:-1]
-    #after halt has been called print again the values
+        if (curr_instruction!=halt):
+            curr_instruction = curr_instruction[:-1]
+    # #after halt has been called print again the values
     solutions.append(" ".join(print_reg_values()))
 
     with open(output_path,"a") as out: # w modes allows us to refresh output file 
@@ -339,7 +339,6 @@ def main_program(input_path,output_path):
         for i in range(len(memory_locations)-1):
             out.write(memory_locations[i]+":"+memory_values[memory_locations[i]]+"\n")
         out.write(memory_locations[-1]+":"+memory_values[memory_locations[-1]]+" ")
-
 
 
 main_program("input.txt","output.txt")
