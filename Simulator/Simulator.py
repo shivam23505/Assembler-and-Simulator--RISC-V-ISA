@@ -333,7 +333,7 @@ def main_program(input_path,output_path):
     # #after halt has been called print again the values
     solutions.append(" ".join(print_reg_values()))
 
-    with open(output_path,"a") as out: # w modes allows us to refresh output file 
+    with open(output_path,"w") as out:
         for i in solutions:
             out.write(i+" \n")
         for i in range(len(memory_locations)-1):
