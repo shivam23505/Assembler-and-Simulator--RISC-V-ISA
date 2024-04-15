@@ -311,7 +311,7 @@ def main_program(input_path,output_path):
     curr_instruction = data[pc//4]
     curr_instruction = curr_instruction[:-1]
     while (curr_instruction!=halt):
-        print(pc)
+        # print(pc)
         curr_opcode = curr_instruction[25:32]
         if curr_opcode =="0110011":
             Rtype(curr_instruction)
@@ -341,14 +341,14 @@ def main_program(input_path,output_path):
         out.write(memory_locations[-1]+":"+memory_values[memory_locations[-1]]+" ")
 
 
-main_program("input.txt","output.txt")
-# if __name__ == "__main__":
-#     if len(sys.argv) != 3:
-#         print("Usage: python3 Filename.py input_file_path output_file_path")
-#         sys.exit(1)
+# main_program("input.txt","output.txt")
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Usage: python3 Filename.py input_file_path output_file_path")
+        sys.exit(1)
 
-#     input_path = sys.argv[1]
-#     output_path = sys.argv[2]
+    input_path = sys.argv[1]
+    output_path = sys.argv[2]
 
-#     main_program(input_path, output_path)
+    main_program(input_path, output_path)
 
