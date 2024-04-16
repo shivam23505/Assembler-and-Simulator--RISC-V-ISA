@@ -68,7 +68,7 @@ def binarytonumber(bin):
 def itype(s):
     s=s[::-1]
     global pc
-    imm=int(s[31:19:-1])
+    imm=(s[31:19:-1])
     rs1=s[19:14:-1]
     func=s[14:11:-1]
     rd=s[11:6:-1]
