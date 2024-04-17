@@ -132,7 +132,7 @@ def Rtype(binary_input):
     rd = binary_input[20:25]
    
     rs2val = binarytonumber_two_complement(register[rs2][2:len(register[rs2])])
-    rs1val = binarytonumber_two_complement(register[rs1][2:len(register[rs2])])
+    rs1val = binarytonumber_two_complement(register[rs1][2:len(register[rs1])])
     rdval = binarytonumber_two_complement(register[rd][2:len(register[rd])])
     pc+=4
 
@@ -255,6 +255,10 @@ def jtype(binary_input):
     imm = binary_input[0]+binary_input[12:20]+binary_input[11]+binary_input[1:11] +"0"
     register[rd] ="0b" + BinaryConverter(pc+4)
     pc = pc + binarytonumber_two_complement(imm)
+    
+    
+
+
 
 
 def btype(binary_input):
@@ -290,6 +294,31 @@ def btype(binary_input):
             pc = (pc+magnitude) if (value_1<value_2) else (pc+4)
         case default:
             return 0
+        
+def Mulconvert(binary_input):
+    func7 = binary_input[0:7]
+    rs2 = binary_input[7:12]
+    rs1 = binary_input[12:17]
+    rd = binary_input[20:25]
+    rs2val = binarytonumber_two_complement(register[rs2][2:len(register[rs2])])
+    rs1val = binarytonumber_two_complement(register[rs1][2:len(register[rs1])])
+    rdval = binarytonumber_two_complement(register[rd][2:len(register[rd])])
+    
+    rdval = rs1val*rs2val        
+    register[rd ] = "0b" + BinaryConverter(rdval)    
+    pc+=4    
+    return 
+
+def resetregister():
+    global pc
+    for i in range(0,32):
+        register[Binary_5_convert(i)]='0b'+'0'*32
+    register[Binary_5_convert(2)]='0b'+BinaryConverter(256)
+    pc+=4
+    
+    
+    
+    
 
 def print_reg_values():
     global pc
@@ -299,6 +328,22 @@ def print_reg_values():
         ans.append(i)
     return ans
 
+def reverse(binary_input):
+    rs1 = binary_input[12:17]
+    rd = binary_input[20:25]
+    rs1val = binarytonumber_two_complement(register[rs1][2:len(register[rs1])])
+    rdval = binarytonumber_two_complement(register[rd][2:len(register[rd])])
+    tempstr = register[rs1][2:len(register[rs1])]
+    newval = ""
+    for i in tempstr:
+        if(i != '\n'):
+            newval = newval + i
+        
+    register[rd] = "0b"+ newval
+    pc+=4
+    
+        
+
 
 def main_program(input_path,output_path):
     global pc
@@ -306,13 +351,33 @@ def main_program(input_path,output_path):
         data = f.readlines()
     for line in data:
         line.strip()
+        
+    
     halt = "0"*25+"1100011"
     solutions = []
     curr_instruction = data[pc//4]
     curr_instruction = curr_instruction[:-1]
     while (curr_instruction!=halt):
-        # print(pc)
         curr_opcode = curr_instruction[25:32]
+        if(curr_instruction == 11111111111111111111111111111111): #halt bonus instruction
+            break
+        
+        
+        
+        # print(pc)
+        elif(curr_instruction == "00000000000000000000000000000000"): # reset bonus instruction
+            resetregister()
+        
+        elif curr_opcode =="0000000"  : #for mul instruction
+            Mulconvert(curr_instruction)
+            
+        
+            
+        elif(curr_opcode == "1010101"): # for reverse instruction
+             reverse(curr_instruction)
+        
+        
+        
         if curr_opcode =="0110011":
             Rtype(curr_instruction)
         elif curr_opcode =="0100011":
@@ -351,4 +416,3 @@ if __name__ == "__main__":
     output_path = sys.argv[2]
 
     main_program(input_path, output_path)
-
